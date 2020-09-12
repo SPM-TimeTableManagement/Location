@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 namespace Location
 {
@@ -23,25 +24,61 @@ namespace Location
         buildingClass b = new buildingClass();
         private void buttonAdd_Click(object sender, EventArgs e)
         {
-            //Get the value from the input fields
-            b.BuildingName = textBoxName.Text;
-            b.NoOfFloor = int.Parse(textBoxFloors.Text);
-            b.NoOfRooms = int.Parse(textBoxRooms.Text);
+            string keyWord = textBoxName.Text;
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select * from tbl_building where buildingName LIKE '%"+keyWord+"%'", conn);
+            DataTable DTs = new DataTable();
+            sda.Fill(DTs);
 
-            //Insert data into data base using Insert method
-            bool success = b.Insert(b);
-            if (success == true)
+            Regex regex = new Regex(@"^[0-9]+$");
+
+            //Get the value from the input fields
+            if (textBoxName.Text == "")
             {
-                MessageBox.Show("New Building Successfully Added");
-                clear();
+                MessageBox.Show("Bulding name is required !");
             }
-            else
+            else if (DTs.Rows.Count != 0)
             {
-                MessageBox.Show("Failed to add building, Try again!!");
+                MessageBox.Show("Bulding name is already used, Please use another name !");
             }
-            //Load data on datagrid
-            DataTable dt = b.Select();
-            dataGridViewBuildingView.DataSource = dt;
+            else if (textBoxFloors.Text == "")
+            {
+                MessageBox.Show("No of Floors are required !");
+            }
+            else if (!regex.IsMatch(textBoxFloors.Text))
+            {
+                MessageBox.Show("No of Floors fields must only numeric value!");
+            }
+            
+            else if (textBoxRooms.Text == "")
+            {
+                MessageBox.Show("No of Rooms are required !");
+            }
+            else if (!regex.IsMatch(textBoxRooms.Text))
+            {
+                MessageBox.Show("No of Rooms fields must only numeric value!");
+            }
+            else 
+            { 
+                b.BuildingName = textBoxName.Text;
+                b.NoOfFloor = int.Parse(textBoxFloors.Text);
+                b.NoOfRooms = int.Parse(textBoxRooms.Text);
+
+                //Insert data into data base using Insert method
+                bool success = b.Insert(b);
+                if (success == true)
+                {
+                    MessageBox.Show("New Building Successfully Added");
+                    clear();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to add building, Try again!!");
+                }
+                //Load data on datagrid
+                DataTable dt = b.Select();
+                dataGridViewBuildingView.DataSource = dt;
+            }
         }
 
         public void clear()
@@ -70,24 +107,61 @@ namespace Location
 
         private void buttonUpdate_Click(object sender, EventArgs e)
         {
-            //Get the value from the input fields
-            b.BuidingId = int.Parse(textBoxBuildingID.Text);
-            b.BuildingName = textBoxName.Text;
-            b.NoOfFloor = int.Parse(textBoxFloors.Text);
-            b.NoOfRooms = int.Parse(textBoxRooms.Text);
+            string keyWord = textBoxName.Text;
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select * from tbl_building where buildingName LIKE '%" + keyWord + "%'", conn);
+            DataTable DTs = new DataTable();
+            sda.Fill(DTs);
 
-            //Insert data into data base using Insert method
-            bool success = b.Update(b);
-            if (success == true)
+            Regex regex = new Regex(@"^[0-9]+$");
+
+            //Get the value from the input fields
+            if (textBoxName.Text == "")
             {
-                MessageBox.Show("New Building Successfully Updated");
-                DataTable dt = b.Select();
-                dataGridViewBuildingView.DataSource = dt;
-                clear();
+                MessageBox.Show("Bulding name is required !");
             }
+            else if (DTs.Rows.Count != 0)
+            {
+                MessageBox.Show("Bulding name is already used, Please use another name !");
+            }
+            else if (textBoxFloors.Text == "")
+            {
+                MessageBox.Show("No of Floors are required !");
+            }
+            else if (!regex.IsMatch(textBoxFloors.Text))
+            {
+                MessageBox.Show("No of Floors fields must only numeric value!");
+            }
+
+            else if (textBoxRooms.Text == "")
+            {
+                MessageBox.Show("No of Rooms are required !");
+            }
+            else if (!regex.IsMatch(textBoxRooms.Text))
+            {
+                MessageBox.Show("No of Rooms fields must only numeric value!");
+            }
+            //Get the value from the input fields
             else
             {
-                MessageBox.Show("Failed to update building, Try again!!");
+                b.BuidingId = int.Parse(textBoxBuildingID.Text);
+                b.BuildingName = textBoxName.Text;
+                b.NoOfFloor = int.Parse(textBoxFloors.Text);
+                b.NoOfRooms = int.Parse(textBoxRooms.Text);
+
+                //Insert data into data base using Insert method
+                bool success = b.Update(b);
+                if (success == true)
+                {
+                    MessageBox.Show("New Building Successfully Updated");
+                    DataTable dt = b.Select();
+                    dataGridViewBuildingView.DataSource = dt;
+                    clear();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to update building, Try again!!");
+                }
             }
         }
 

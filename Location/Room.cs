@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -23,26 +24,66 @@ namespace Location
         roomClass r = new roomClass();
         private void buttonAddR_Click(object sender, EventArgs e)
         {
-            r.BuildingName = comboBoxBuildingName.Text;
-            r.RoomName = textBoxname.Text;
-            r.FloorNo = int.Parse(comboBoxFloorNo.Text);
-            r.Capacity = int.Parse(textBoxcapacity.Text);
-            r.Types = comboBoxType.Text;
+            string keyWord = textBoxname.Text;
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select * from tbl_room where roomName LIKE '%" + keyWord + "%'", conn);
+            DataTable DTs = new DataTable();
+            sda.Fill(DTs);
 
-            //Insert data into data base using Insert method
-            bool success = r.Insert(r);
-            if (success == true)
+            Regex regex = new Regex(@"^[0-9]+$");
+            if(comboBoxBuildingName.Text == "")
             {
-                MessageBox.Show("New Room Successfully Added");
-                clear();
+                MessageBox.Show("Please Select Building name !");
             }
+            else if(comboBoxFloorNo.Text == "")
+            {
+                MessageBox.Show("Please Select Floor No !");
+            }
+            else if (textBoxname.Text == "")
+            {
+                MessageBox.Show("Room name is required !");
+            }
+            else if (DTs.Rows.Count != 0)
+            {
+                MessageBox.Show("Room name is already used, Please use another name !");
+            }
+            else if (textBoxcapacity.Text == "")
+            {
+                MessageBox.Show("Capacity are required !");
+            }
+            else if (!regex.IsMatch(textBoxcapacity.Text))
+            {
+                MessageBox.Show("Capacity fields must only numeric value!");
+            }
+
+            else if (comboBoxType.Text == "")
+            {
+                MessageBox.Show("Room Type is required !");
+            }
+
             else
             {
-                MessageBox.Show("Failed to add Room, Try again!!");
+                r.BuildingName = comboBoxBuildingName.Text;
+                r.RoomName = textBoxname.Text;
+                r.FloorNo = int.Parse(comboBoxFloorNo.Text);
+                r.Capacity = int.Parse(textBoxcapacity.Text);
+                r.Types = comboBoxType.Text;
+
+                //Insert data into data base using Insert method
+                bool success = r.Insert(r);
+                if (success == true)
+                {
+                    MessageBox.Show("New Room Successfully Added");
+                    clear();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to add Room, Try again!!");
+                }
+                //Load data on datagrid
+                DataTable dt = r.Select();
+                dataGridViewRoom.DataSource = dt;
             }
-            //Load data on datagrid
-            DataTable dt = r.Select();
-            dataGridViewRoom.DataSource = dt;
         }
 
         public void clear()
@@ -60,6 +101,16 @@ namespace Location
             //Load data on datagrid
             DataTable dt = r.Select();
             dataGridViewRoom.DataSource = dt;
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select distinct buildingName from tbl_building",conn);
+            DataTable DTs = new DataTable();
+            sda.Fill(DTs);
+            comboBoxBuildingName.Items.Clear();
+            //comboBoxBuildingName.Items.Add("---SELECT---");
+            foreach (DataRow row in DTs.Rows)
+            {
+                comboBoxBuildingName.Items.Add(row["buildingName"].ToString());
+            }
         }
 
         private void dataGridViewRoom_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -75,26 +126,65 @@ namespace Location
 
         private void button1UpdateR_Click(object sender, EventArgs e)
         {
-            //Get the value from the input fields
-            r.RoomId = int.Parse(textBoxID.Text);
-            r.BuildingName = comboBoxBuildingName.Text;
-            r.Types = comboBoxType.Text;
-            r.FloorNo = int.Parse(comboBoxFloorNo.Text);
-            r.Capacity = int.Parse(textBoxcapacity.Text);
-            r.RoomName = textBoxname.Text;
+            string keyWord = textBoxname.Text;
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select * from tbl_room where roomName LIKE '%" + keyWord + "%'", conn);
+            DataTable DTs = new DataTable();
+            sda.Fill(DTs);
 
-            //Insert data into data base using Insert method
-            bool success = r.Update(r);
-            if (success == true)
+            Regex regex = new Regex(@"^[0-9]+$");
+            if (comboBoxBuildingName.Text == "")
             {
-                MessageBox.Show("New Building Successfully Updated");
-                DataTable dt = r.Select();
-                dataGridViewRoom.DataSource = dt;
-                clear();
+                MessageBox.Show("Please Select Building name !");
+            }
+            else if (comboBoxFloorNo.Text == "")
+            {
+                MessageBox.Show("Please Select Floor No !");
+            }
+            else if (textBoxname.Text == "")
+            {
+                MessageBox.Show("Room name is required !");
+            }
+            else if (DTs.Rows.Count != 0)
+            {
+                MessageBox.Show("Room name is already used, Please use another name !");
+            }
+            else if (textBoxcapacity.Text == "")
+            {
+                MessageBox.Show("Capacity are required !");
+            }
+            else if (!regex.IsMatch(textBoxcapacity.Text))
+            {
+                MessageBox.Show("Capacity fields must only numeric value!");
+            }
+
+            else if (comboBoxType.Text == "")
+            {
+                MessageBox.Show("Room Type is required !!!");
             }
             else
             {
-                MessageBox.Show("Failed to update building, Try again!!");
+                //Get the value from the input fields
+                r.RoomId = int.Parse(textBoxID.Text);
+                r.BuildingName = comboBoxBuildingName.Text;
+                r.Types = comboBoxType.Text;
+                r.FloorNo = int.Parse(comboBoxFloorNo.Text);
+                r.Capacity = int.Parse(textBoxcapacity.Text);
+                r.RoomName = textBoxname.Text;
+
+                //Insert data into data base using Insert method
+                bool success = r.Update(r);
+                if (success == true)
+                {
+                    MessageBox.Show("New Building Successfully Updated");
+                    DataTable dt = r.Select();
+                    dataGridViewRoom.DataSource = dt;
+                    clear();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to update building, Try again!!");
+                }
             }
         }
 
@@ -131,6 +221,30 @@ namespace Location
             DataTable dt = new DataTable();
             sda.Fill(dt);
             dataGridViewRoom.DataSource = dt;
+        }
+
+        private void comboBoxBuildingName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            SqlConnection conn = new SqlConnection(myconnstr);
+            SqlDataAdapter sda = new SqlDataAdapter("Select distinct floorNo from tbl_building where buildingName='"+comboBoxBuildingName.Text+"'", conn);
+            DataTable dt = new DataTable();
+            sda.Fill(dt);
+            comboBoxFloorNo.Items.Clear();
+            foreach(DataRow row in dt.Rows)
+            {
+                
+                //comboBoxFloorNo.Items.Add(row["floorNo"].ToString());
+                if (Int32.Parse(row["floorNo"].ToString()) != 0)
+                {
+                    for(int i=1; i <= Int32.Parse(row["floorNo"].ToString()); i++)
+                    {
+                        comboBoxFloorNo.Items.Add(i);
+                    }
+                    
+                }
+                
+                
+            }
         }
     }
 }

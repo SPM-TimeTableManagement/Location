@@ -62,18 +62,14 @@
             // 
             // comboBoxBuildingName
             // 
+            this.comboBoxBuildingName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxBuildingName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxBuildingName.FormattingEnabled = true;
-            this.comboBoxBuildingName.Items.AddRange(new object[] {
-            "Main Hall",
-            "Computing",
-            "New",
-            "Art",
-            "Business"});
             this.comboBoxBuildingName.Location = new System.Drawing.Point(177, 70);
             this.comboBoxBuildingName.Name = "comboBoxBuildingName";
             this.comboBoxBuildingName.Size = new System.Drawing.Size(179, 28);
             this.comboBoxBuildingName.TabIndex = 1;
+            this.comboBoxBuildingName.SelectedIndexChanged += new System.EventHandler(this.comboBoxBuildingName_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -87,14 +83,9 @@
             // 
             // comboBoxFloorNo
             // 
+            this.comboBoxFloorNo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxFloorNo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxFloorNo.FormattingEnabled = true;
-            this.comboBoxFloorNo.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5"});
             this.comboBoxFloorNo.Location = new System.Drawing.Point(177, 137);
             this.comboBoxFloorNo.Name = "comboBoxFloorNo";
             this.comboBoxFloorNo.Size = new System.Drawing.Size(84, 28);
