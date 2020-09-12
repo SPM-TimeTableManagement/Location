@@ -176,7 +176,7 @@ namespace Location
                 bool success = r.Update(r);
                 if (success == true)
                 {
-                    MessageBox.Show("New Building Successfully Updated");
+                    MessageBox.Show("New Building Successfully Updated!");
                     DataTable dt = r.Select();
                     dataGridViewRoom.DataSource = dt;
                     clear();
